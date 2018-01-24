@@ -6,8 +6,9 @@ import java.util.ArrayList;
  * Created by Student on 2018/1/17.
  */
 
-public class StudentScoreDAO {
-
+public class StudentScoreDAO implements  StudentDAO{
+    //method 都寫在DAO
+    //經過ExampleInitTest測試完畢 才開始寫介面程式
     public ArrayList<Student> mylist;
     public StudentScoreDAO()
     {

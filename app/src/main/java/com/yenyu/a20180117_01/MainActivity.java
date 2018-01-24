@@ -10,35 +10,37 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.yenyu.a20180117_01.data.DBtype;
 import com.yenyu.a20180117_01.data.Student;
+import com.yenyu.a20180117_01.data.StudentDAO;
+import com.yenyu.a20180117_01.data.StudentDAOFactory;
+import com.yenyu.a20180117_01.data.StudentFileDAO;
 import com.yenyu.a20180117_01.data.StudentScoreDAO;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     ListView lv;
-    final public static StudentScoreDAO dao=new StudentScoreDAO();
+    public static StudentDAO dao;
+    DBtype dbtype;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> studentNames;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-    }
-    @Override //onCreate只有在一開始開app才會啟動，所以離開後回來是啟動onResume
-    protected void onResume() {
-        super.onResume();
-
-        lv = (ListView)findViewById(R.id.listView);
-        ArrayList<String> studentNames = new ArrayList<>();
-        for(Student s:dao.getList())
-        {
-            studentNames.add(s.name);
-        }
-        ArrayAdapter<String> adapter= new ArrayAdapter<String>(
+        dbtype=DBtype.CLOUD; //1.記憶體 2.檔案 3.資料庫 4.雲端
+        dao= StudentDAOFactory.getDAOInstance(this,dbtype);
+        //dao 在onCreate 新增，因為this 必須Activtiy啟動才會產生
+        //放最外層宣告 會讀不到
+        studentNames = new ArrayList<>();
+        adapter= new ArrayAdapter<String>(
                 MainActivity.this,android.R.layout.simple_list_item_1,studentNames);
-        lv.setAdapter(adapter);
+        lv = (ListView)findViewById(R.id.listView);
+        lv.setAdapter(adapter); //利用ArrayAdapter 編輯ListView 內容及顯示模式
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
+            @Override   //設定每個ListView的按鈕
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Intent it = new Intent(MainActivity.this,ShowActivity.class);
@@ -46,6 +48,23 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(it);
             }
         });
+    }
+    @Override //onCreate只有在一開始開app才會啟動，所以離開後回來是啟動onResume
+    protected void onResume() {
+        super.onResume();
+        //將所有名字都顯示在ListView上
+       refreshData();
+    }
+
+
+    public void refreshData()
+    {
+        studentNames.clear();
+        for(Student s:dao.getList())
+        {
+            studentNames.add(s.name);
+        }
+        adapter.notifyDataSetChanged();
     }
 
 
@@ -63,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
             Intent it = new Intent(MainActivity.this,AddActivity.class);
             startActivity(it);
         }
-
-
-
         return super.onOptionsItemSelected(item);
     }
 

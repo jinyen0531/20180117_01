@@ -25,6 +25,7 @@ public class AddActivity extends AppCompatActivity {
         String name = ed2.getText().toString();
         int score = Integer.valueOf(ed3.getText().toString());
         MainActivity.dao.add(new Student(id,name,score));
-        finish();
+        finish(); //利用dao的add方式 將輸入的值傳進去Student陣列
+        //輸入finish() 才會回到上一頁
     }
 }
